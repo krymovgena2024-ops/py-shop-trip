@@ -1,13 +1,8 @@
 from app.customer import Customer
 from app.shop import Shop
+from app.utils import is_integer
 import datetime
 import json
-
-
-def is_integer(number: int) -> int:
-    if number == int(number):
-        return int(number)
-    return number
 
 
 def shop_trip() -> None:
@@ -47,7 +42,8 @@ def shop_trip() -> None:
             fuel_cost = ((distance * 2) / 100) * fuel_consumption * fuel_price
             products_prices = {}
             for product, quantity in customer.products.items():
-                price_of_product = quantity * shop.products[product]
+                price_of_product = shop.calculate_product_cost(
+                    product, quantity)
                 products_prices[product] = price_of_product
             sum_products_price = sum(products_prices.values())
             total_cost = sum_products_price + fuel_cost
@@ -64,6 +60,7 @@ def shop_trip() -> None:
         target_index = shops_objects.index(prices_of_trips[smallest_price])
         target_store = shops_objects[target_index]
         print(f"{customer.name} rides to {target_store.name}\n")
+        customer.location = target_store.location
         print(
             f"""Date: {datetime.datetime.now().strftime(
                 "%d/%m/%Y %H:%M:%S")}""")
@@ -71,7 +68,8 @@ def shop_trip() -> None:
         print("You have bought:")
         price_of_all_products = 0
         for product, quantity in customer.products.items():
-            price_of_product = quantity * target_store.products[product]
+            price_of_product = target_store.calculate_product_cost(
+                product, quantity)
             price_of_product = is_integer(price_of_product)
             price_of_all_products += price_of_product
             print(f"{quantity} {product}s for {price_of_product} dollars")
